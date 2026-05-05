@@ -487,13 +487,26 @@ const BlockSystem = (() => {
     el.draggable        = true;
     el.title            = blockDef.description || blockDef.name;
 
-    el.innerHTML = `
-      <div class="palette-block-icon">${Utils.escapeHtml(blockDef.icon || '□')}</div>
-      <div class="palette-block-info">
-        <div class="palette-block-name">${Utils.escapeHtml(blockDef.name)}</div>
-        <div class="palette-block-desc">${Utils.escapeHtml(blockDef.description || '')}</div>
-      </div>
-    `;
+    // Build DOM nodes directly to avoid any risk of XSS with API-sourced block metadata
+    const iconEl = document.createElement('div');
+    iconEl.className   = 'palette-block-icon';
+    iconEl.textContent = blockDef.icon || '□';
+
+    const infoEl = document.createElement('div');
+    infoEl.className   = 'palette-block-info';
+
+    const nameEl = document.createElement('div');
+    nameEl.className   = 'palette-block-name';
+    nameEl.textContent = blockDef.name;
+
+    const descEl = document.createElement('div');
+    descEl.className   = 'palette-block-desc';
+    descEl.textContent = blockDef.description || '';
+
+    infoEl.appendChild(nameEl);
+    infoEl.appendChild(descEl);
+    el.appendChild(iconEl);
+    el.appendChild(infoEl);
 
     // HTML5 Drag-and-Drop
     el.addEventListener('dragstart', e => {
@@ -535,14 +548,27 @@ const BlockSystem = (() => {
     // Params state
     el.dataset.params = JSON.stringify(instance.params || {});
 
-    // Header
+    // Header – build with DOM APIs to avoid innerHTML XSS with API-sourced data
     const header = document.createElement('div');
     header.className = 'ws-block-header';
-    header.innerHTML = `
-      <span class="ws-block-icon">${Utils.escapeHtml(def.icon || '□')}</span>
-      <span class="ws-block-title">${Utils.escapeHtml(def.name)}</span>
-      <button class="ws-block-delete" title="Delete block" data-id="${instance.instanceId}">✕</button>
-    `;
+
+    const iconSpan = document.createElement('span');
+    iconSpan.className   = 'ws-block-icon';
+    iconSpan.textContent = def.icon || '□';
+
+    const titleSpan = document.createElement('span');
+    titleSpan.className   = 'ws-block-title';
+    titleSpan.textContent = def.name;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'ws-block-delete';
+    delBtn.title     = 'Delete block';
+    delBtn.dataset.id = instance.instanceId;
+    delBtn.textContent = '✕';
+
+    header.appendChild(iconSpan);
+    header.appendChild(titleSpan);
+    header.appendChild(delBtn);
 
     // Body: parameters
     const body = document.createElement('div');
@@ -583,9 +609,12 @@ const BlockSystem = (() => {
         body.appendChild(row);
       });
     } else {
-      body.innerHTML = `<span style="color:var(--text-muted);font-size:11px;font-style:italic">
-        ${Utils.escapeHtml(def.description || 'No parameters')}
-      </span>`;
+      const descSpan = document.createElement('span');
+      descSpan.style.color    = 'var(--text-muted)';
+      descSpan.style.fontSize = '11px';
+      descSpan.style.fontStyle= 'italic';
+      descSpan.textContent    = def.description || 'No parameters';
+      body.appendChild(descSpan);
     }
 
     el.appendChild(header);

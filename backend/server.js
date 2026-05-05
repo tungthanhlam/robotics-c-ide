@@ -20,11 +20,47 @@ const express  = require('express');
 const cors     = require('cors');
 const fs       = require('fs');
 const path     = require('path');
+const crypto   = require('crypto');
+const os       = require('os');
 const { execFile } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+/* ── RATE LIMITING (simple in-memory) ─────────────────────── */
+const rateLimitMap = new Map();
+
+/**
+ * Simple rate-limiter middleware factory.
+ * @param {number} maxRequests – max calls per window
+ * @param {number} windowMs    – rolling window in ms
+ */
+function rateLimit(maxRequests, windowMs) {
+  return (req, res, next) => {
+    const key = req.ip || 'unknown';
+    const now = Date.now();
+    const entry = rateLimitMap.get(key) || { count: 0, reset: now + windowMs };
+
+    if (now > entry.reset) {
+      entry.count = 0;
+      entry.reset = now + windowMs;
+    }
+    entry.count += 1;
+    rateLimitMap.set(key, entry);
+
+    if (entry.count > maxRequests) {
+      return res.status(429).json({ error: 'Too many requests, please try again later.' });
+    }
+    next();
+  };
+}
+
+// Periodically purge stale rate-limit entries to avoid memory growth
+setInterval(() => {
+  const now = Date.now();
+  rateLimitMap.forEach((v, k) => { if (now > v.reset) rateLimitMap.delete(k); });
+}, 60_000);
 
 /* ── MIDDLEWARE ────────────────────────────────────────────── */
 app.use(cors());
@@ -100,7 +136,8 @@ app.get('/api/projects', (_req, res) => {
   res.json(projects);
 });
 
-app.post('/api/projects', (req, res) => {
+// Rate-limited writes: max 30 project saves per minute per IP
+app.post('/api/projects', rateLimit(30, 60_000), (req, res) => {
   const { name, description, blocks } = req.body || {};
   if (!name) return res.status(400).json({ error: 'Project name is required' });
 
@@ -148,15 +185,16 @@ app.delete('/api/projects/:id', (req, res) => {
 });
 
 /* ── Compile ───────────────────────────────────────────────── */
-app.post('/api/compile', (req, res) => {
+// Rate-limited: max 10 compile requests per minute per IP
+app.post('/api/compile', rateLimit(10, 60_000), (req, res) => {
   const { code } = req.body || {};
   if (!code) return res.status(400).json({ error: 'No code provided' });
 
-  // Write code to a temp file and compile with gcc
-  const os = require('os');
-  const tmpDir  = os.tmpdir();
-  const srcFile = path.join(tmpDir, `prog_${Date.now()}.c`);
-  const outFile = path.join(tmpDir, `prog_${Date.now()}.out`);
+  // Use a cryptographically random filename to avoid race conditions
+  const randomId = crypto.randomUUID();
+  const tmpDir   = os.tmpdir();
+  const srcFile  = path.join(tmpDir, `prog_${randomId}.c`);
+  const outFile  = path.join(tmpDir, `prog_${randomId}.out`);
 
   try {
     fs.writeFileSync(srcFile, code, 'utf8');
