@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+*.out
+*.o
+/tmp/
+backend/data/projects.json

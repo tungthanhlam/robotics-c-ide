@@ -1,0 +1,217 @@
+/* =========================================================
+   blocks.css – Palette blocks and workspace block elements
+   ========================================================= */
+
+/* ── PALETTE BLOCK (in sidebar) ────────────────────────── */
+.palette-block {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: grab;
+  border: 1px solid transparent;
+  background: var(--bg-card);
+  transition: transform var(--tr-fast), box-shadow var(--tr-fast),
+              border-color var(--tr-fast), background var(--tr-fast);
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+}
+.palette-block::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--block-color, var(--accent-blue));
+  border-radius: 8px 0 0 8px;
+}
+.palette-block:hover {
+  transform: translateX(2px);
+  border-color: var(--block-color, var(--accent-blue));
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+}
+.palette-block:active { cursor: grabbing; transform: scale(0.97); }
+.palette-block.dragging { opacity: 0.5; }
+
+.palette-block-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: var(--block-color, var(--accent-blue));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  color: #fff;
+}
+.palette-block-info { display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.palette-block-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.palette-block-desc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Category-specific colors */
+.palette-block[data-category="control"]   { --block-color: var(--color-control);   }
+.palette-block[data-category="variables"] { --block-color: var(--color-variables); }
+.palette-block[data-category="functions"] { --block-color: var(--color-functions); }
+.palette-block[data-category="io"]        { --block-color: var(--color-io);        }
+.palette-block[data-category="robotics"]  { --block-color: var(--color-robotics);  }
+.palette-block[data-category="logic"]     { --block-color: var(--color-logic);     }
+
+/* ── WORKSPACE BLOCK ────────────────────────────────────── */
+.workspace-block {
+  position: absolute;
+  min-width: 180px;
+  max-width: 340px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--block-color, var(--accent-blue));
+  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+  cursor: move;
+  user-select: none;
+  transition: box-shadow var(--tr-fast), border-color var(--tr-fast);
+  animation: popIn 0.18s ease;
+  z-index: 10;
+}
+.workspace-block:hover {
+  box-shadow: 0 6px 22px rgba(0,0,0,0.55);
+  z-index: 20;
+}
+.workspace-block.selected {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px var(--block-color, var(--accent-blue)), 0 6px 22px rgba(0,0,0,0.5);
+  z-index: 25;
+}
+.workspace-block.dragging-ws {
+  box-shadow: 0 14px 40px rgba(0,0,0,0.7);
+  opacity: 0.92;
+  z-index: 200;
+}
+
+/* Block header bar */
+.ws-block-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--block-color, var(--accent-blue));
+  border-radius: 8px 8px 0 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12.5px;
+}
+/* Ensure logic category text is readable */
+.workspace-block[data-category="logic"] .ws-block-header { color: #111; }
+
+.ws-block-icon { font-size: 14px; flex-shrink: 0; }
+.ws-block-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Delete button inside block header */
+.ws-block-delete {
+  background: rgba(0,0,0,0.25);
+  border: none;
+  color: rgba(255,255,255,0.8);
+  border-radius: 4px;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  transition: background var(--tr-fast), color var(--tr-fast);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.ws-block-delete:hover { background: rgba(255,0,0,0.4); color: #fff; }
+
+/* Block body (parameters) */
+.ws-block-body {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Parameter row */
+.ws-block-param {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.ws-block-param-label {
+  color: var(--text-secondary);
+  min-width: 70px;
+  flex-shrink: 0;
+  font-size: 11.5px;
+}
+.ws-block-param-input {
+  flex: 1;
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  outline: none;
+  transition: border-color var(--tr-fast);
+  min-width: 0;
+}
+.ws-block-param-input:focus { border-color: var(--block-color, var(--accent-blue)); }
+
+.ws-block-param-select {
+  flex: 1;
+  background: var(--bg-workspace);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Category-specific block colors */
+.workspace-block[data-category="control"]   { --block-color: var(--color-control);   }
+.workspace-block[data-category="variables"] { --block-color: var(--color-variables); }
+.workspace-block[data-category="functions"] { --block-color: var(--color-functions); }
+.workspace-block[data-category="io"]        { --block-color: var(--color-io);        }
+.workspace-block[data-category="robotics"]  { --block-color: var(--color-robotics);  }
+.workspace-block[data-category="logic"]     { --block-color: var(--color-logic);     }
+
+/* Connection ports */
+.ws-block-ports {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.ws-block-port {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 1.5px solid var(--block-color, var(--accent-blue));
+  cursor: crosshair;
+  transition: transform var(--tr-fast), background var(--tr-fast);
+}
+.ws-block-port:hover { transform: scale(1.4); background: var(--block-color, var(--accent-blue)); }
+
+/* No-result state in palette */
+.palette-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
