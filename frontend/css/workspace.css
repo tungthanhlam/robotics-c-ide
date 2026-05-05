@@ -1,0 +1,178 @@
+/* =========================================================
+   workspace.css – Center workspace canvas area
+   ========================================================= */
+
+/* ── WORKSPACE CONTAINER ───────────────────────────────── */
+.workspace-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-workspace);
+}
+
+/* ── WORKSPACE TOOLBAR ─────────────────────────────────── */
+.workspace-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+.workspace-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+.workspace-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ws-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 5px;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: background var(--tr-fast), color var(--tr-fast);
+  cursor: pointer;
+}
+.ws-btn:hover { background: #323947; color: var(--text-primary); }
+.ws-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+.block-count-badge {
+  background: var(--bg-code);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 10px;
+  padding: 2px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+/* ── WORKSPACE CANVAS ──────────────────────────────────── */
+.workspace-canvas {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  cursor: default;
+
+  /* Grid background */
+  background-color: var(--bg-workspace);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+  background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+}
+
+/* Extend the draggable area */
+.workspace-canvas::after {
+  content: '';
+  display: block;
+  min-width: 2000px;
+  min-height: 1500px;
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+}
+
+/* ── DROP INDICATOR ────────────────────────────────────── */
+.drop-indicator {
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+  border: 2px dashed var(--accent-blue);
+  border-radius: 10px;
+  background: rgba(56, 139, 253, 0.08);
+  display: none;
+  transition: all var(--tr-fast);
+}
+.workspace-canvas.drag-over .drop-indicator {
+  display: block;
+}
+
+/* ── WORKSPACE HINT ────────────────────────────────────── */
+.workspace-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-muted);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transition: opacity var(--tr-med);
+}
+.workspace-hint.hidden { opacity: 0; }
+.workspace-hint p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── BLOCK CONNECTOR LINES (SVG overlay) ───────────────── */
+.ws-connections-svg {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+.ws-connection-line {
+  stroke: var(--accent-blue);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  fill: none;
+  opacity: 0.5;
+}
+
+/* ── DRAG GHOST ────────────────────────────────────────── */
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.82;
+  transform: rotate(2deg) scale(0.95);
+  transition: opacity 0.1s;
+  border-radius: 8px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+}
+
+/* ── SELECTION BOX ─────────────────────────────────────── */
+.selection-box {
+  position: absolute;
+  border: 1px solid var(--accent-blue);
+  background: rgba(56, 139, 253, 0.07);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 30;
+  display: none;
+}
+
+/* ── RESPONSIVE ADJUSTMENTS ────────────────────────────── */
+@media (max-width: 900px) {
+  :root {
+    --sidebar-left-w: 180px;
+    --sidebar-right-w: 220px;
+  }
+  .palette-block-desc { display: none; }
+}
+
+@media (max-width: 680px) {
+  .sidebar-right { display: none; }
+  .logo-text { display: none; }
+  .btn span { display: none; }
+}

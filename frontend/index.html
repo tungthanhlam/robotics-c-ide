@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robotics C IDE – VEXcode Go Style</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/blocks.css" />
+  <link rel="stylesheet" href="css/workspace.css" />
+</head>
+<body>
+
+  <!-- ====== TOP NAVIGATION BAR ====== -->
+  <header class="navbar">
+    <div class="navbar-left">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="6" fill="#FF6B35"/>
+          <text x="5" y="20" font-size="16" fill="white" font-weight="bold">C</text>
+        </svg>
+        <span class="logo-text">Robotics C IDE</span>
+      </div>
+    </div>
+
+    <div class="navbar-center">
+      <input type="text" id="projectName" class="project-name-input" value="Untitled Project" />
+    </div>
+
+    <div class="navbar-right">
+      <button class="btn btn-secondary" id="btnNew" title="New Project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        New
+      </button>
+      <button class="btn btn-secondary" id="btnOpen" title="Open Project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        Open
+      </button>
+      <button class="btn btn-secondary" id="btnSave" title="Save Project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Save
+      </button>
+      <div class="separator"></div>
+      <button class="btn btn-compile" id="btnCompile" title="Compile Code">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+        Compile
+      </button>
+      <button class="btn btn-run" id="btnRun" title="Run Program">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        Run
+      </button>
+    </div>
+  </header>
+
+  <!-- ====== MAIN CONTENT AREA ====== -->
+  <div class="main-container">
+
+    <!-- ====== LEFT SIDEBAR – BLOCK PALETTE ====== -->
+    <aside class="sidebar-left" id="blockPalette">
+      <div class="category-tabs">
+        <button class="cat-tab active" data-category="all">All</button>
+        <button class="cat-tab" data-category="control">Control</button>
+        <button class="cat-tab" data-category="variables">Variables</button>
+        <button class="cat-tab" data-category="functions">Functions</button>
+        <button class="cat-tab" data-category="io">I/O</button>
+        <button class="cat-tab" data-category="robotics">Robotics</button>
+        <button class="cat-tab" data-category="logic">Logic</button>
+      </div>
+
+      <div class="palette-search">
+        <input type="text" id="blockSearch" class="search-input" placeholder="Search blocks…" />
+      </div>
+
+      <div class="palette-blocks" id="paletteBlocks">
+        <!-- Blocks injected by JS -->
+        <div class="palette-loading">
+          <div class="spinner"></div>
+          <span>Loading blocks…</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====== CENTER WORKSPACE ====== -->
+    <main class="workspace-container">
+      <div class="workspace-toolbar">
+        <span class="workspace-title">Workspace</span>
+        <div class="workspace-controls">
+          <button class="ws-btn" id="btnUndo" title="Undo">↩</button>
+          <button class="ws-btn" id="btnRedo" title="Redo">↪</button>
+          <button class="ws-btn" id="btnClear" title="Clear Workspace">🗑</button>
+          <span class="block-count-badge" id="blockCount">0 blocks</span>
+        </div>
+      </div>
+
+      <div class="workspace-canvas" id="workspaceCanvas">
+        <!-- Dropped blocks rendered here -->
+        <div class="workspace-hint" id="workspaceHint">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#8899aa" stroke-width="1">
+            <rect x="3" y="3" width="8" height="6" rx="1"/>
+            <rect x="13" y="3" width="8" height="6" rx="1"/>
+            <rect x="3" y="13" width="8" height="6" rx="1"/>
+            <rect x="13" y="13" width="8" height="6" rx="1"/>
+          </svg>
+          <p>Drag blocks from the palette<br/>to start building your program</p>
+        </div>
+
+        <!-- Block drop zone indicator -->
+        <div class="drop-indicator" id="dropIndicator"></div>
+      </div>
+    </main>
+
+    <!-- ====== RIGHT SIDEBAR – CODE PREVIEW ====== -->
+    <aside class="sidebar-right" id="codePreview">
+      <div class="code-preview-header">
+        <span class="code-preview-title">C Code Output</span>
+        <div class="code-preview-controls">
+          <button class="code-btn" id="btnCopyCode" title="Copy to Clipboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy
+          </button>
+          <button class="code-btn" id="btnDownloadCode" title="Download C File">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            .c
+          </button>
+        </div>
+      </div>
+
+      <div class="code-preview-body">
+        <div class="line-numbers" id="lineNumbers"></div>
+        <pre class="code-output" id="codeOutput"><code id="codeContent">/* Add blocks to generate C code */
+</code></pre>
+      </div>
+
+      <div class="code-preview-footer">
+        <span id="codeStatus" class="code-status ok">Ready</span>
+        <span id="codeLines">1 line</span>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ====== STATUS BAR ====== -->
+  <footer class="status-bar">
+    <span class="status-item" id="statusMessage">Ready</span>
+    <div class="status-right">
+      <span class="status-item" id="statusBlocks">Blocks: 0</span>
+      <span class="status-item" id="statusConnection">
+        <span class="status-dot online"></span> Connected
+      </span>
+    </div>
+  </footer>
+
+  <!-- ====== CONTEXT MENU ====== -->
+  <div class="context-menu" id="contextMenu">
+    <div class="context-item" id="ctxEdit">✏️ Edit Parameters</div>
+    <div class="context-item" id="ctxDuplicate">📋 Duplicate</div>
+    <div class="context-separator"></div>
+    <div class="context-item danger" id="ctxDelete">🗑 Delete Block</div>
+  </div>
+
+  <!-- ====== MODAL: NEW PROJECT ====== -->
+  <div class="modal-overlay" id="modalNew">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New Project</h2>
+        <button class="modal-close" data-modal="modalNew">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>Project Name
+          <input type="text" id="newProjectName" class="modal-input" value="My Robot Program" />
+        </label>
+        <label>Description
+          <textarea id="newProjectDesc" class="modal-input modal-textarea" placeholder="Optional description…"></textarea>
+        </label>
+        <div class="modal-warning" id="newProjectWarning">
+          ⚠️ Unsaved changes will be lost. Continue?
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal="modalNew">Cancel</button>
+        <button class="btn btn-run" id="btnConfirmNew">Create Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL: OPEN PROJECT ====== -->
+  <div class="modal-overlay" id="modalOpen">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Open Project</h2>
+        <button class="modal-close" data-modal="modalOpen">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="project-list" id="projectList">
+          <div class="project-list-empty">No saved projects yet.</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal="modalOpen">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL: COMPILE RESULT ====== -->
+  <div class="modal-overlay" id="modalCompile">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h2>Compile Result</h2>
+        <button class="modal-close" data-modal="modalCompile">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="compile-result" id="compileResult">
+          <pre id="compileOutput"></pre>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal="modalCompile">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== MODAL: EDIT BLOCK PARAMETERS ====== -->
+  <div class="modal-overlay" id="modalEditBlock">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="editBlockTitle">Edit Block</h2>
+        <button class="modal-close" data-modal="modalEditBlock">✕</button>
+      </div>
+      <div class="modal-body" id="editBlockBody">
+        <!-- Dynamically generated parameter fields -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-modal="modalEditBlock">Cancel</button>
+        <button class="btn btn-run" id="btnSaveBlockParams">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== NOTIFICATION TOAST ====== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ====== JAVASCRIPT ====== -->
+  <script src="js/utils.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/block-system.js"></script>
+  <script src="js/code-generator.js"></script>
+  <script src="js/workspace.js"></script>
+  <script src="js/project-manager.js"></script>
+  <script src="js/ui-controller.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
